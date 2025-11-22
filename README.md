@@ -58,3 +58,20 @@ Couplage simple => certains sommets peuvent rester non couverts.
 On peut voir un domino comme une arête reliant deux sommets, un noir et un blanc. L’objectif étant de paver toutes les cases de l’échiquier (modélisé comme un graphe biparti, comme démontré précédemment), cela revient à couvrir deux cases voisines (deux sommets) avec un domino.
 
 Parvenir à couvrir tous les sommets avec les dominos revient donc à chercher un couplage parfait pour ce graphe.
+
+
+
+
+
+
+
+
+### Question 3 (Rabah) : 
+
+Dans le graphe modélisant l’échiquier mutilé, chaque sommet représente une case, et chaque arête relie deux cases adjacentes. Une arête correspond donc à un emplacement possible pour un domino.
+
+Un couplage est un ensemble d’arêtes qui ne partagent aucun sommet : cela représente un ensemble de dominos placés sans chevauchement.
+Un couplage parfait est un couplage dans lequel chaque sommet appartient exactement à une arête. Cela signifie que chaque case est couverte par un unique domino.
+
+Ainsi, un couplage parfait correspond exactement à un pavage complet de l’échiquier par des dominos.
+Si un couplage parfait existe, alors le pavage est possible ; sinon, il est impossible de recouvrir toutes les cases restantes avec des dominos.
