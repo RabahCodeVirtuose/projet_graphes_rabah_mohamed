@@ -19,7 +19,7 @@ Etant donné la définition de voisinage dans ce problème (les cases en diagona
 
 
 
-###### Version reformulée par GPT
+###### Version reformulée 
 Étant donné la définition du voisinage dans ce problème (les cases en diagonale ne sont pas prises en compte), on modélise chaque case par un sommet, coloré en blanc ou noir comme dans un damier. En construisant le graphe associé à l’échiquier mutilé, on relie deux sommets si leurs cases sont adjacentes orthogonalement. Or deux cases adjacentes ont toujours des couleurs opposées : un sommet blanc ne peut donc être adjacent qu’à un sommet noir, et réciproquement. Ainsi, aucune arête ne relie deux sommets d’une même couleur. D’après la définition d’un graphe biparti, ce graphe est bien biparti.
 
 
@@ -50,7 +50,7 @@ Parvenir donc à couvrir otous les sommets avec les dominos, revient à chercher
 
 
 
-###### Version adaptée par GPT : 
+###### Version reformulée : 
 
 Couplage parfait => tous les sommets sont couverts.
 Couplage simple => certains sommets peuvent rester non couverts.
