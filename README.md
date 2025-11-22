@@ -39,3 +39,22 @@ Dans l'échiquier (sous la forme d'un graphe G = (V,E)), on peut remarquer que
 
 
 ### Question 3 : 
+
+
+couplage parfait, => Tous les sommets sont couverts.  
+couplage simple => On peut avoir des sommets non couverts.
+
+On peut voir un domino comme une arête entre 2 sommets noir et blanc. L'objectif etant de paver l'échiquier tout entier (échiquier étant un graphe biparti comme démontré precedemment), celà revient à chercher à couvrir 2 cases voinses (2 sommets) avec un domino.
+
+Parvenir donc à couvrir otous les sommets avec les dominos, revient à chercher un couplage parfait pour ce graphe.
+
+
+
+###### Version adaptée par GPT : 
+
+Couplage parfait => tous les sommets sont couverts.
+Couplage simple => certains sommets peuvent rester non couverts.
+
+On peut voir un domino comme une arête reliant deux sommets, un noir et un blanc. L’objectif étant de paver toutes les cases de l’échiquier (modélisé comme un graphe biparti, comme démontré précédemment), cela revient à couvrir deux cases voisines (deux sommets) avec un domino.
+
+Parvenir à couvrir tous les sommets avec les dominos revient donc à chercher un couplage parfait pour ce graphe.
