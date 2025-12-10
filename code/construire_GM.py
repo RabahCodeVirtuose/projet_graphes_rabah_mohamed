@@ -121,12 +121,12 @@ def construire_niveaux(GM) :
         # on ne garde que les arcs vers le niveau suivant
         H[u] = [v for v in GM[u] if v in H_sommets and niveau[v] == niveau[u] + 1]
 
-    return H
+    return H, niveau # on va aussi recup le dict de niveau 
                 
                 
 N, B = bipartition(GM)  # récupère la bipartition du graphe
 
-#H = construire_niveaux(M,N,B)  
+#H, niveau = construire_niveaux(M,N,B)  
 
 
 ######################################################################################### renverser
@@ -152,8 +152,62 @@ def renverser(H) :
     
     
 
-H = construire_niveaux(M,N,B)
+H , niveau= construire_niveaux(M,N,B)
 H_prime = renverser(H) 
+
+
+
+'''def chemins_augmentants(M, N, B) :
+    libres_N, libres_B = sommets_libres(M, N, B)
+    P = []
+    for i in libres_B : ## Que des sommets libres de B de niveau k 
+        path_list = list(DFS(i))
+        B.remove(i) 
+        
+    P.append(path_list)
+    return P 
+    libres_k = {b for b in libres_B if niveau[b] == k}
+
+    for b in libres_k:
+        chemin = dfs_vers_niveau_0(H_T, b, niveau, libres_N)
+        if chemin is not None:
+            P.append(chemin)
+
+    return P'''
+    
+    
+    
+def dfs_augmentant(u, niveau, HT, chemin, chemins):
+    if niveau[u] == 0:
+        chemins.append(list(reversed(chemin + [u])))
+        return
+
+    for v in HT[u]:
+        if niveau[v] == niveau[u] - 1:
+            dfs_augmentant(v, niveau, HT, chemin + [u], chemins)
+    
+    
+
+def chemins_augmentants(HT, niveau, B, libres_B):
+    # pour chaque sommet libre dans B au niveau k,
+    # on remonte dans HT jusqu'à atteindre un sommet au niveau 0
+    chemins = []
+
+    for b in libres_B:
+        if b not in niveau:
+            continue
+
+        dfs_augmentant(b, niveau, HT, [], chemins)
+
+    return chemins
+
+
+ 
+N, B = bipartition(G)
+libres_N, libres_B = sommets_libres(M, N, B)
+H , niveau= construire_niveaux(M,N,B)
+HT = renverser(H)
+P = chemins_augmentants(HT, niveau, B, libres_B)
 
 
 
