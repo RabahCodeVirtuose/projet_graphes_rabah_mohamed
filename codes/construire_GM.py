@@ -4,7 +4,8 @@ from collections import deque
 
 
 # Graphe (mini exemple)
-G = {
+
+'''G = {
     "n1": ["b1", "b2"],
     "n2": ["b1"],
     "n3": [],
@@ -12,6 +13,17 @@ G = {
     "b2": ["n1"]
 }
 
+
+## Juste un exemple de couplage vide au début
+M = {
+    "n1" : None,
+    "n2" : None, 
+    "n3" : None, 
+    "b1" : None, 
+    "b2" : None
+}
+
+'''
 
 def bipartition(G):
     color = {}
@@ -33,31 +45,17 @@ def bipartition(G):
     return N, B
 
 
-## Juste un exemple de couplage vide au début
-M = {
-    "n1" : None,
-    "n2" : None, 
-    "n3" : None, 
-    "b1" : None, 
-    "b2" : None
-}
-
-
-
-
 def construire_GM(G, M) :
     GM = {u: [] for u in G}
+        
     N, B = bipartition(G)
+    #print(N) # debug 
+    #print(B) # debug 
     
-    
-    
-    print(N) # debug 
-    print(B) # debug 
-    
-    for u in G :
+    '''for u in G :
         for v in G[u] :
             if u in N and v in B :
-                if M[u] == v : 
+                if M.get(u) == v : 
                     if u not in GM[v] : # Suppression des doublons 
                         GM[v].append(u) 
                 else : 
@@ -71,11 +69,27 @@ def construire_GM(G, M) :
                     if u not in GM[v] : # Suppression des doublons 
                         GM[v].append(u)
                 
-    return GM 
+    return GM '''
+    ## M est  maintenant un set => Adaptation 
+    for u in G:
+        for v in G[u]:
+            if u in N and v in B:
+                if (u,v) in M:
+                    if u not in GM[v]:
+                        GM[v].append(u)
+                else:
+                    if v not in GM[u]:
+                        GM[u].append(v)
+            elif u in B and v in N:
+                if (u,v) in M or (v,u) in M:
+                    if v not in GM[u]:
+                        GM[u].append(v)
+                else:
+                    if u not in GM[v]:
+                        GM[v].append(u)
+    return GM
     
-    
-GM = construire_GM(G, M)
-
+  
 ############################################################################################ construire_niveaux 
 
 def sommets_libres(M, N, B): # M est le couplage , qu'on a 
@@ -84,24 +98,25 @@ def sommets_libres(M, N, B): # M est le couplage , qu'on a
     - les sommets libres de N
     - les sommets libres de B
     """
-    libres_N = {u for u in N if M[u] is None}
+    '''libres_N = {u for u in N if M[u] is None}
     libres_B = {v for v in B if M[v] is None}
+    return libres_N, libres_B'''
+    libres_N = {u for u in N if all(u not in edge for edge in M)}
+    libres_B = {v for v in B if all(v not in edge for edge in M)}
     return libres_N, libres_B
 
 
 
 
-def construire_niveaux(GM) :
-    libres_N, libres_B = sommets_libres(M, N, B) # M est notre couplage 
-
-# Initialisation du BFS
+def construire_niveaux(GM, libres_N, libres_B):
     niveau = {}
     queue = deque()
 
+    # niveau 0 = libres_N
     for u in libres_N:
         niveau[u] = 0
         queue.append(u)
-        
+
     k = float('inf')
 
     while queue:
@@ -110,23 +125,20 @@ def construire_niveaux(GM) :
             if v not in niveau:
                 niveau[v] = niveau[u] + 1
                 queue.append(v)
-            if v in libres_B:
-                k = min(k, niveau[v])
-                
-                
-    H_sommets = {u for u, lvl in niveau.items() if lvl <= k} ## Les sommets situés à une distance supérieure à k dans GM n’appartiennent pas à H => voir sujet
-    
-    H = {}
-    for u in H_sommets:
-        # on ne garde que les arcs vers le niveau suivant
-        H[u] = [v for v in GM[u] if v in H_sommets and niveau[v] == niveau[u] + 1]
+                if v in libres_B:
+                    k = niveau[v]
 
-    return H, niveau # on va aussi recup le dict de niveau 
-                
-                
-N, B = bipartition(GM)  # récupère la bipartition du graphe
+    # On ne garde que les sommets jusqu'au niveau k
+    H = {u: [] for u, lvl in niveau.items() if lvl <= k}
 
-#H, niveau = construire_niveaux(M,N,B)  
+    # On conserve uniquement les arcs menant à un niveau suivant
+    for u in H:
+        H[u] = [v for v in GM[u]
+                if v in H and niveau[v] == niveau[u] + 1]
+
+    return H, niveau
+                
+   
 
 
 ######################################################################################### renverser
@@ -143,38 +155,14 @@ def renverser(H) :
 
     H_T = {u: [] for u in sommets}
     
-    # inverser les arêtes
+    # inverse les arêtes
     for u in H:
         for v in H[u]:
             H_T[v].append(u)
 
     return H_T
     
-    
-
-H , niveau= construire_niveaux(M,N,B)
-H_prime = renverser(H) 
-
-
-
-'''def chemins_augmentants(M, N, B) :
-    libres_N, libres_B = sommets_libres(M, N, B)
-    P = []
-    for i in libres_B : ## Que des sommets libres de B de niveau k 
-        path_list = list(DFS(i))
-        B.remove(i) 
-        
-    P.append(path_list)
-    return P 
-    libres_k = {b for b in libres_B if niveau[b] == k}
-
-    for b in libres_k:
-        chemin = dfs_vers_niveau_0(H_T, b, niveau, libres_N)
-        if chemin is not None:
-            P.append(chemin)
-
-    return P'''
-    
+  
     
     
 def dfs_augmentant(u, niveau, HT, chemin, chemins):
@@ -202,13 +190,72 @@ def chemins_augmentants(HT, niveau, B, libres_B):
     return chemins
 
 
- 
-N, B = bipartition(G)
-libres_N, libres_B = sommets_libres(M, N, B)
-H , niveau= construire_niveaux(M,N,B)
-HT = renverser(H)
-P = chemins_augmentants(HT, niveau, B, libres_B)
 
 
+'''
+Résumé des fonctions principales en présence : 
+=> Construire_GM(G)
+=> Construire_niveaux(GM)
+=> Renverser(H)
+=> chemins_augmentants(HT, niveau, B, libres_B).
+
+
+Fonctions utilitaires : 
+
+->bipartition(G) (nous retourne la bi-partition)
+-> sommets_libres(M,N,B) (nous retourne les chemins libres des partitions N et B,
+    avec M le couplage).
+-> dfs_augmentant(u, niveau, HT, chemin, chemins) (DFS à partir d'un sommet libre
+    u de niveau k dans la partition de droite B par arriver à un sommet de 
+    dégré 0 dans la partition de gauche N).
+
+'''
+
+
+def Hopcroft_Karp(G):
+
+    N, B = bipartition(G)
+    M = set()            # couplage
+       
+    while True:
+        
+        # 1. Construire GM
+        GM = construire_GM(G, M)
+
+        # 2. Sommets libres
+        libres_N, libres_B = sommets_libres(M, N, B)
+
+        # 3. Construire niveaux
+        H, niveau = construire_niveaux(GM, libres_N, libres_B)
+
+        # 4. Renverser
+        H_reversed = renverser(H)
+
+        # 5. Chemins augmentants
+        P = chemins_augmentants(H_reversed, niveau, B, libres_B)
+
+        # 6. Si aucun chemin → fini
+        if not P:
+            break
+
+        # 7. Appliquer les augmentations
+        for p in P:
+            M = M.symmetric_difference(p)    # symmetric difference
+
+    return M
+
+        
+        
+        
+
+        
+        
+
+        
+        
+    
+    
+    
+    
 
 ##### Si tu lis ça, Rabah, faudrait qu'on se voit pour que je t'explique plus en profondeur ce que j'ai compris !
