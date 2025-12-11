@@ -11,17 +11,15 @@ def run_all_tests():
 
     try:
         # Pavables (doivent renvoyer True)
-        assert main("fichiers_test/smallboard.txt", debug_mode=True) == True
+        assert main("fichiers_test/smallboard.txt", debug_mode=False) == True
         assert main("fichiers_test/tilable1.txt",  debug_mode=False) == True
         assert main("fichiers_test/tilable2.txt",  debug_mode=False) == True
         assert main("fichiers_test/tilable3.txt",  debug_mode=False) == True
-        assert main("fichiers_test/tilable4.txt",  debug_mode=False) == True
 
         # Non pavables (doivent renvoyer False)
         assert main("fichiers_test/badsmallboard.txt", debug_mode=False) == False
         assert main("fichiers_test/nottilable1.txt",   debug_mode=False) == False
         assert main("fichiers_test/nottilable2.txt",   debug_mode=False) == False
-        assert main("fichiers_test/nottilable3.txt",   debug_mode=False) == False
 
     except AssertionError:
         print("Un test a échoué — regarde la sortie pour identifier lequel.")

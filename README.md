@@ -75,3 +75,41 @@ Un couplage parfait est un couplage dans lequel chaque sommet appartient exactem
 
 Ainsi, un couplage parfait correspond exactement à un pavage complet de l’échiquier par des dominos.
 Si un couplage parfait existe, alors le pavage est possible ; sinon, il est impossible de recouvrir toutes les cases restantes avec des dominos.
+
+
+### Question 4 : 
+
+```
+def bipartition(G):
+    """
+    Détermine et retourne les deux partitions (N et B) d'un graphe biparti G.
+    Utilise un parcours en largeur (BFS) pour colorier les sommets.
+
+    Args:
+        G (dict): Le graphe d'entrée, représenté par un dictionnaire d'adjacence.
+
+    Returns:
+        tuple: Un tuple contenant deux ensembles (sets) de sommets:
+               - N (set): L'ensemble des sommets de la partition 0.
+               - B (set): L'ensemble des sommets de la partition 1.
+               
+    Note: Si le graphe n'est pas connexe, la bipartition s'applique à toutes les composantes.
+    """
+    color = {}
+    
+    for start in G:
+        if start not in color:
+            color[start] = 0
+            queue = deque([start])
+            
+            while queue:
+                u = queue.popleft()
+                for v in G[u]: 
+                    if v not in color: 
+                        color[v] = 1 - color[u] 
+                        queue.append(v) 
+    
+    N = {u for u in color if color[u] == 0}
+    B = {u for u in color if color[u] == 1}
+    return N, B
+```

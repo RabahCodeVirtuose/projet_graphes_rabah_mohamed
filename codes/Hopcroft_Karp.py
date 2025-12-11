@@ -28,7 +28,7 @@ def main(filepath, debug_mode=True):
         # Condition 2 : Pair -> possible SEULEMENT si |M| atteint |V|/2
         pavage_possible = len(M) == nb_cases // 2
         
-    if not debug_mode:
+    '''if not debug_mode:
         
         # Afficher le booléen sur la sortie standard
         print(pavage_possible) 
@@ -56,6 +56,32 @@ def main(filepath, debug_mode=True):
         print(f"Nombre de cases non X = {nb_cases}")
         print(f"Taille du matching = {len(M)}")
         print(f"Nombre de dominos possibles = {nb_cases // 2}")
+        print("----------------------\n")'''
+        
+        
+    print(f"Pavable ? : {pavage_possible}")
+        
+    if pavage_possible:
+        print(f"Nombre de dominos possibles : {nb_cases // 2}")
+        base_name = os.path.basename(filepath) # Ex: 'smallboard.txt'
+        output_filename = f"results/dominos_{base_name}" # Ex: 'results/dominos_smallboard.txt'
+        export_dominos_matrix(M, board, output_filename)
+    
+        print("\n--- Infos du Graphe ---")
+        print("Board lu =")
+        for row in board:
+            print(row)
+        print(f"Nombre de cases non X = {nb_cases}")
+        #print(f"Taille du matching = {len(M)}")
+        print(f"Nombre de dominos possibles = {nb_cases // 2}")
+        print("----------------------\n")
+    else :   
+        print("\n--- Infos du Graphe ---")
+        print("Board lu =")
+        for row in board:
+            print(row)
+        print(f"Nombre de cases non X = {nb_cases}")
+        print(f"Nombre de dominos max = {nb_cases // 2}")
         print("----------------------\n")
         
     return pavage_possible
