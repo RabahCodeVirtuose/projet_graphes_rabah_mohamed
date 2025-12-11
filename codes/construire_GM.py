@@ -49,44 +49,19 @@ def construire_GM(G, M) :
     GM = {u: [] for u in G}
         
     N, B = bipartition(G)
-    #print(N) # debug 
-    #print(B) # debug 
-    
-    '''for u in G :
-        for v in G[u] :
-            if u in N and v in B :
-                if M.get(u) == v : 
-                    if u not in GM[v] : # Suppression des doublons 
-                        GM[v].append(u) 
-                else : 
-                    if v not in GM[u] : # Suppression des doublons 
-                        GM[u].append(v) 
-            elif u in B and v in N : 
-                if M[u] == v  :
-                    if v not in GM[u] : # Suppression des doublons 
-                        GM[u].append(v)
-                else : 
-                    if u not in GM[v] : # Suppression des doublons 
-                        GM[v].append(u)
+    # On garantit que toutes les arêtes (u,v) de G sont traitées une fois
+    for u in N: # On ne parcourt que N
+        for v in G[u]: # Voisin de u, doit être dans B
+            if (u, v) in M: # Arête couplée
+                # Arête résiduelle B -> N (v -> u)
+                GM[v].append(u)
+            else: # Arête non couplée
+                # Arête résiduelle N -> B (u -> v)
+                GM[u].append(v)
                 
-    return GM '''
-    ## M est  maintenant un set => Adaptation 
-    for u in G:
-        for v in G[u]:
-            if u in N and v in B:
-                if (u,v) in M:
-                    if u not in GM[v]:
-                        GM[v].append(u)
-                else:
-                    if v not in GM[u]:
-                        GM[u].append(v)
-            elif u in B and v in N:
-                if (u,v) in M or (v,u) in M:
-                    if v not in GM[u]:
-                        GM[u].append(v)
-                else:
-                    if u not in GM[v]:
-                        GM[v].append(u)
+    # Pour les arêtes couplées dans M, on s'assure que B->N est dans GM
+    # (ce qui est déjà fait ci-dessus si G[u] pour u in N couvre toutes les arêtes)
+    
     return GM
     
   
@@ -100,7 +75,10 @@ def sommets_libres(M, N, B): # M est le couplage , qu'on a
     """
     '''libres_N = {u for u in N if M[u] is None}
     libres_B = {v for v in B if M[v] is None}
-    return libres_N, libres_B'''
+    return libres_N, libres_B
+    Un sommet u est libre s'il n'apparaît dans aucune arête du couplage M
+
+    '''
     libres_N = {u for u in N if all(u not in edge for edge in M)}
     libres_B = {v for v in B if all(v not in edge for edge in M)}
     return libres_N, libres_B
@@ -165,27 +143,70 @@ def renverser(H) :
   
     
     
-def dfs_augmentant(u, niveau, HT, chemin, chemins):
+def dfs_augmentant(u, niveau, HT, chemin, chemins, N,bloques):
+    """
+    DFS qui remonte du sommet u jusqu'au niveau 0.
+    - chemin : liste des sommets visités
+    - chemins : liste des chemins sous forme de sets d'arêtes orientées N->B
+    - N : ensemble des sommets de la partition N pour orientation
+    """
+    # La vérification de u in bloques sera faite par l'appelant pour le sommet de départ
+    
     if niveau[u] == 0:
-        chemins.append(list(reversed(chemin + [u])))
-        return
+        arcs = set()
+        full_path = list(reversed(chemin + [u]))
+        
+        # Le sommet de niveau 0 (dans N) est maintenant inclus dans le path
+        
+        for i in range(len(full_path)-1):
+            a, b = full_path[i], full_path[i+1]
+            
+            # ORIENTATION : Toujours N -> B
+            if a in N:
+                arcs.add((a, b))
+            else:
+                arcs.add((b, a))
+        
+        chemins.append(arcs)
+        
+        # Blocage de tous les sommets du chemin
+        for node in full_path:
+            bloques.add(node)
+        
+        return True # Chemin trouvé!
+    
+    
+    
 
+    # DFS récursif
     for v in HT[u]:
-        if niveau[v] == niveau[u] - 1:
-            dfs_augmentant(v, niveau, HT, chemin + [u], chemins)
+        # On vérifie si v est bloqué AVANT de descendre.
+        if niveau[v] == niveau[u] - 1 and v not in bloques:
+            
+            # Si l'appel récursif trouve un chemin...
+            if dfs_augmentant(v, niveau, HT, chemin + [u], chemins, N, bloques):
+                # ...le chemin entier est bloqué. On arrête de chercher d'autres chemins partant de u.
+                # Ceci garantit qu'un sommet (u) ne participe qu'à un seul chemin dans cette phase.
+                # Marquer u comme bloqué est déjà fait par le blocage du full_path.
+                return True
     
-    
+    return False # Pas de chemin trouvé partant d'ici
 
-def chemins_augmentants(HT, niveau, B, libres_B):
-    # pour chaque sommet libre dans B au niveau k,
-    # on remonte dans HT jusqu'à atteindre un sommet au niveau 0
+
+
+def chemins_augmentants(HT, niveau, libres_B, N):
+    """
+    Parcours tous les sommets libres de B et récupère les chemins augmentants
+    sous forme de sets d'arêtes (u ∈ N, v ∈ B)
+    """
     chemins = []
+    bloques = set()
 
     for b in libres_B:
-        if b not in niveau:
+        if b not in niveau or b in bloques: # Ne pas partir d'un libre_B déjà utilisé
             continue
-
-        dfs_augmentant(b, niveau, HT, [], chemins)
+            
+        dfs_augmentant(b, niveau, HT, [], chemins, N, bloques)
 
     return chemins
 
@@ -232,15 +253,16 @@ def Hopcroft_Karp(G):
         H_reversed = renverser(H)
 
         # 5. Chemins augmentants
-        P = chemins_augmentants(H_reversed, niveau, B, libres_B)
+        P = chemins_augmentants(H_reversed, niveau, libres_B, N)
 
         # 6. Si aucun chemin → fini
         if not P:
             break
 
         # 7. Appliquer les augmentations
-        for p in P:
-            M = M.symmetric_difference(p)    # symmetric difference
+        for arcs_du_chemin in P:
+            # on transforme chaque chemin de sommets en set d’arêtes
+            M = M.symmetric_difference(arcs_du_chemin)
 
     return M
 

@@ -1,48 +1,61 @@
-#from fichiers_test import file_processing  
-
 import sys
 import os
 
 # Ajouter le dossier parent au path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-
 from codes.construire_GM import Hopcroft_Karp
-
-
-from fichiers_test.file_processing import read_board, construire_graphe_depuis_board
-
-
-def export_dominos(M, filename):
-    """
-    Exporte le pavage en fichier : chaque arête du matching M = un domino.
-    Chaque arête est un tuple (u,v).
-    On numérote les dominos de 1 à t.
-    """
-    exported = set()  # pour éviter de doubler les arêtes (u,v) et (v,u)
-    with open(filename, "w") as f:
-        for i, (u,v) in enumerate(M, 1):
-            # ignorer les arêtes déjà exportées dans l'autre sens
-            if (v,u) in exported:
-                continue
-            f.write(f"{i} : {u} - {v}\n")
-            exported.add((u,v))
+from fichiers_test.file_processing import read_board, construire_graphe_depuis_board, export_dominos_matrix
 
 
 
-# 1. Lire le fichier
-board = read_board("../fichiers_test/echiquier_format.txt")
+def main(filepath, debug_mode=True):
+    # Lire l'échiquier
+    board = read_board(filepath)
 
-# 2. Construire le graphe biparti
-G = construire_graphe_depuis_board(board)
+    # Construire le graphe biparti
+    G = construire_graphe_depuis_board(board)
 
-# 3. Passer à Hopcroft-Karp
-M = Hopcroft_Karp(G)
+    # Trouver un matching maximal
+    M = Hopcroft_Karp(G)
 
-# 4. Vérifier pavage possible
-nb_cases = sum(cell != "X" for row in board for cell in row)
-pavage_possible = len(M) == nb_cases // 2
-print(pavage_possible)
-if pavage_possible :
-    print("Nombres de dominos possibles : ", nb_cases // 2)
-    export_dominos(M, "../results/dominos.txt")       
+    nb_cases = sum(cell != "X" for row in board for cell in row)
+    #pavage_possible = len(M) == nb_cases // 2
+    
+    if nb_cases % 2 != 0:
+        # Condition 1 : Impair -> impossible de paver parfaitement
+        pavage_possible = False
+    else:
+        # Condition 2 : Pair -> possible SEULEMENT si |M| atteint |V|/2
+        pavage_possible = len(M) == nb_cases // 2
+        
+    if not debug_mode:
+        
+        # Afficher le booléen sur la sortie standard
+        print(pavage_possible) 
+        
+        # Si pavable, produire le fichier
+        if pavage_possible:
+            export_dominos_matrix(M,board, "results/dominos.txt")
+            
+        return pavage_possible
+
+    # --- 4. Mode DEBUG (Pour les tests et le développement) ---
+    else: 
+        # Si debug_mode=True, on affiche TOUTES les informations de test/debug
+        print("--- MODE DEBUG ---")
+        print(f"Pavable : {pavage_possible}")
+        
+        if pavage_possible:
+            print(f"Nombre de dominos : {nb_cases // 2}")
+            export_dominos_matrix(M,board, "results/dominos.txt")
+        
+        print("\n--- Infos du Graphe ---")
+        print("Board lu =")
+        for row in board:
+            print(row)
+        print(f"Nombre de cases non X = {nb_cases}")
+        print(f"Taille du matching = {len(M)}")
+        print(f"Nombre de dominos possibles = {nb_cases // 2}")
+        print("----------------------\n")
+        
+    return pavage_possible

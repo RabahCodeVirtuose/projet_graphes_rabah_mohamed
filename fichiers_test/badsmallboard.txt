@@ -1,0 +1,9 @@
+8
+B N B N B N X X
+N B N B N B X X
+B N B N B N X X
+X X N B N B N X
+B N B N B N B N
+N B X X N B N B
+B N X X B N B N
+N B N B N B N B
