@@ -8,7 +8,7 @@ from fichiers_test.file_processing import read_board, construire_graphe_depuis_b
 
 
 
-def main(filepath, debug_mode=True):
+def main(filepath):
     # Lire l'échiquier
     board = read_board(filepath)
 
@@ -27,36 +27,6 @@ def main(filepath, debug_mode=True):
     else:
         # Condition 2 : Pair -> possible SEULEMENT si |M| atteint |V|/2
         pavage_possible = len(M) == nb_cases // 2
-        
-    '''if not debug_mode:
-        
-        # Afficher le booléen sur la sortie standard
-        print(pavage_possible) 
-        
-        # Si pavable, produire le fichier
-        if pavage_possible:
-            export_dominos_matrix(M,board, "results/dominos.txt")
-            
-        return pavage_possible
-
-    # --- 4. Mode DEBUG (Pour les tests et le développement) ---
-    else: 
-        # Si debug_mode=True, on affiche TOUTES les informations de test/debug
-        print("--- MODE DEBUG ---")
-        print(f"Pavable : {pavage_possible}")
-        
-        if pavage_possible:
-            print(f"Nombre de dominos : {nb_cases // 2}")
-            export_dominos_matrix(M,board, "results/dominos.txt")
-        
-        print("\n--- Infos du Graphe ---")
-        print("Board lu =")
-        for row in board:
-            print(row)
-        print(f"Nombre de cases non X = {nb_cases}")
-        print(f"Taille du matching = {len(M)}")
-        print(f"Nombre de dominos possibles = {nb_cases // 2}")
-        print("----------------------\n")'''
         
         
     print(f"Pavable ? : {pavage_possible}")
