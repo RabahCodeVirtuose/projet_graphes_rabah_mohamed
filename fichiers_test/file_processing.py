@@ -14,7 +14,7 @@ def read_board(filename):
 
 def construire_graphe_depuis_board(board):
     """
-    Transforme le board en graphe biparti G compatible avec tes fonctions.
+    Transforme le board en graphe G.
     Chaque sommet est une chaîne : 'B_i_j' ou 'N_i_j'.
     """
     n = len(board)

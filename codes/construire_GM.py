@@ -180,7 +180,6 @@ def dfs_augmentant(u, niveau, HT, chemin, chemins, N,bloques):
         bool: True si un chemin augmentant a été trouvé depuis u, False sinon.
     """
     
-    # La vérification de u in bloques sera faite par l'appelant pour le sommet de départ
     
     if niveau[u] == 0:
         arcs = set()
@@ -203,11 +202,11 @@ def dfs_augmentant(u, niveau, HT, chemin, chemins, N,bloques):
         for node in full_path:
             bloques.add(node)
         
-        return True # Chemin trouvé!
+        return True # Chemin trouvé
     
     # DFS récursif
     for v in HT[u]:
-        # On vérifie si v est bloqué AVANT de descendre.
+        # On vérifie si v est bloqué avant de descendre
         if niveau[v] == niveau[u] - 1 and v not in bloques:
             
             # Si l'appel récursif trouve un chemin...

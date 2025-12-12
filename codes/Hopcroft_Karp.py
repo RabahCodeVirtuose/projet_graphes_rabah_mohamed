@@ -22,10 +22,10 @@ def main(filepath):
     #pavage_possible = len(M) == nb_cases // 2
     
     if nb_cases % 2 != 0:
-        # Condition 1 : Impair -> impossible de paver parfaitement
+        # Impair -> impossible de paver parfaitement
         pavage_possible = False
     else:
-        # Condition 2 : Pair -> possible SEULEMENT si |M| atteint |V|/2
+        # Pair -> possible seulement si |M| atteint |V|/2
         pavage_possible = len(M) == nb_cases // 2
         
         
